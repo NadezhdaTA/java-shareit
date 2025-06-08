@@ -29,7 +29,7 @@ public class UserService implements UserServiceInterface {
         return userMapper.toUserResponseDto(userStorage.createUser(newUser));
     }
 
-    public UserResponseDto getUserById(Long userId) throws NotFoundException{
+    public UserResponseDto getUserById(Long userId) throws NotFoundException {
         return userMapper.toUserResponseDto(userStorage.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found, id = " + userId)));
     }

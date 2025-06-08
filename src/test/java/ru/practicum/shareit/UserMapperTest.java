@@ -18,7 +18,7 @@ public class UserMapperTest {
     private UserMapper userMapper;
 
     @Test
-    public void UserToUserRequestDtoTest() {
+    public void userToUserRequestDtoTest() {
         User user = new User(1L, "TestName", "test@test.com");
 
         UserRequestDto userRequestDto = userMapper.toUserRequestDto(user);
@@ -31,7 +31,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void UserRequestDtoToUserTest() {
+    public void userRequestDtoToUserTest() {
         UserRequestDto userRequestDto = new UserRequestDto(2L, "TestName2", "test2@test.com");
         User user = userMapper.toUser(userRequestDto);
         assertAll(() -> {
@@ -42,7 +42,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void UserResponseDtoToUserTest() {
+    public void userResponseDtoToUserTest() {
         UserResponseDto userResponseDto = new UserResponseDto(3L, "TestName3", "test3@test.com");
         User user = userMapper.toUser(userResponseDto);
         assertAll(() -> {
@@ -53,7 +53,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void UserToUserResponseDtoTest() {
+    public void userToUserResponseDtoTest() {
         User user = new User(4L, "TestName4", "test4@test.com");
         UserResponseDto userResponseDto = userMapper.toUserResponseDto(user);
         assertAll(() -> {

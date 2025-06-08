@@ -17,7 +17,7 @@ public class ItemMapperTest {
     private ItemMapper itemMapper;
 
     @Test
-    public void ItemRequestDtoToItemTest() {
+    public void itemRequestDtoToItemTest() {
         ItemRequestDto itemRequestDto = new ItemRequestDto(
                 1L, "TestName", "Test description", true, 1L);
 
@@ -34,7 +34,7 @@ public class ItemMapperTest {
     }
 
     @Test
-    public void ItemToItemResponseDtoTest() {
+    public void itemToItemResponseDtoTest() {
         Item item = new Item(2L, "TestName2", "Test description2", true, 2L, 2L);
 
         ItemResponseDto itemResponseDto = itemMapper.toItemResponseDto(item);
@@ -49,7 +49,7 @@ public class ItemMapperTest {
     }
 
     @Test
-    public void ItemRequestDtoToItemResponseDtoTest() {
+    public void itemRequestDtoToItemResponseDtoTest() {
         ItemRequestDto item = new ItemRequestDto(
                 3L, "TestName3", "Test description3", false, 3L);
 
@@ -65,7 +65,7 @@ public class ItemMapperTest {
     }
 
     @Test
-    public void ItemResponseDtoToItemRequestDtoTest() {
+    public void itemResponseDtoToItemRequestDtoTest() {
         ItemResponseDto itemResponseDto = new ItemResponseDto(
                 4L, "TestName4", "Test description4", false, 4L, 4L);
         ItemRequestDto itemRequestDto = itemMapper.toItemRequestDto(itemResponseDto);
