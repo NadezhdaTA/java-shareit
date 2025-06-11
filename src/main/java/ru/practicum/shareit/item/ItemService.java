@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AnotherUserException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -23,8 +22,6 @@ public class ItemService implements ItemServiceInterface {
 
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
-
-    @Qualifier("itemMapper")
     private final ItemMapper itemMapper;
 
     public ItemResponseDto createItem(ItemRequestDto item, Long ownerId) {

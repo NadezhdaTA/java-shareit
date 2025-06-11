@@ -1,10 +1,8 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.interfaces.ItemStorageInterface;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
@@ -14,8 +12,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemStorage implements ItemStorageInterface {
 
-    @Qualifier("itemMapper")
-    private final ItemMapper itemMapper;
     private Long nextItemId = 1L;
     private final Map<Long, Item> items = new HashMap<>();
 

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -19,8 +18,6 @@ import java.util.Optional;
 public class UserService implements UserServiceInterface {
 
     private final UserStorage userStorage;
-
-    @Qualifier("userMapper")
     private final UserMapper userMapper;
 
     public UserResponseDto createUser(UserRequestDto user) {
