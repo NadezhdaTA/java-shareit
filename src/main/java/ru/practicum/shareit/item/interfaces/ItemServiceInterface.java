@@ -1,0 +1,19 @@
+package ru.practicum.shareit.item.interfaces;
+
+import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
+
+import java.util.Collection;
+
+public interface ItemServiceInterface {
+    ItemResponseDto createItem(ItemRequestDto item, Long ownerId);
+
+    ItemResponseDto getItemById(Long id);
+
+    ItemResponseDto updateItem(Long itemId, ItemRequestDto item, Long ownerId);
+
+    Collection<ItemResponseDto> getAllItemsForOwner(Long ownerId);
+
+    Collection<ItemResponseDto> searchByText(String text);
+
+}
