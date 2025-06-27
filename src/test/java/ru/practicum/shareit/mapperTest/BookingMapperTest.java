@@ -33,7 +33,7 @@ public class BookingMapperTest {
     @Autowired
     private ItemMapper itemMapper;
 
-    User user =new User(1L, "testName1", "test1@test.com");
+    User user = new User(1L, "testName1", "test1@test.com");
 
     ItemRequest itemRequest = new ItemRequest(1L, "testDescription1",
             1L, LocalDate.of(2025, 6, 25));

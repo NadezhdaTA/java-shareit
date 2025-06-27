@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.dto.ItemResponseDtoWithComments;
 import ru.practicum.shareit.item.model.Item;
 
-@Mapper(componentModel=MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ItemMapper {
     ItemResponseDto toItemResponseDto(ItemRequestDto itemRequestDto);
 
@@ -17,7 +17,7 @@ public interface ItemMapper {
     Item toItem(ItemRequestDto itemRequestDto);
 
     default ItemResponseDto toItemResponseDto(Item item) {
-        if(item == null) {
+        if (item == null) {
             return null;
         }
 
@@ -28,7 +28,7 @@ public interface ItemMapper {
         itemResponseDto.setIsAvailable(item.getIsAvailable());
         itemResponseDto.setOwnerId(item.getOwner().getUserId());
 
-        if(item.getItemRequest() != null) {
+        if (item.getItemRequest() != null) {
             itemResponseDto.setRequestId(item.getItemRequest().getRequesterId());
         }
 
@@ -39,7 +39,7 @@ public interface ItemMapper {
     ItemBookerDto toItemBookerDto(Item item);
 
     default ItemResponseDtoWithComments toItemResponseDtoWithComments(Item item) {
-        if(item == null) {
+        if (item == null) {
             return null;
         }
 
@@ -52,7 +52,7 @@ public interface ItemMapper {
         itemResponseDtoWithComments.setItemId(item.getItemId());
         itemResponseDtoWithComments.setOwnerId(item.getOwner().getUserId());
 
-        if(item.getItemRequest() != null) {
+        if (item.getItemRequest() != null) {
             itemResponseDtoWithComments.setRequestId(item.getItemRequest().getItemRequestId());
         }
 

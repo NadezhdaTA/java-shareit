@@ -7,7 +7,7 @@ import ru.practicum.shareit.item.dto.CommentResponseCreatedDto;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.model.Comment;
 
-@Mapper(componentModel=MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CommentMapper {
     Comment toComment(CommentRequestDto comment);
 
@@ -15,7 +15,7 @@ public interface CommentMapper {
 
 
     default CommentResponseCreatedDto toCommentResponseCreatedDto(Comment comment) {
-        if(comment == null) {
+        if (comment == null) {
             return null;
         }
 
