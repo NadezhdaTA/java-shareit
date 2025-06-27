@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.dto.ItemResponseDtoWithComments;
 import ru.practicum.shareit.item.model.Item;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel=MappingConstants.ComponentModel.SPRING)
 public interface ItemMapper {
     ItemResponseDto toItemResponseDto(ItemRequestDto itemRequestDto);
 
@@ -17,7 +17,7 @@ public interface ItemMapper {
     Item toItem(ItemRequestDto itemRequestDto);
 
     default ItemResponseDto toItemResponseDto(Item item) {
-        if (item == null) {
+        if(item == null) {
             return null;
         }
 
@@ -39,7 +39,7 @@ public interface ItemMapper {
     ItemBookerDto toItemBookerDto(Item item);
 
     default ItemResponseDtoWithComments toItemResponseDtoWithComments(Item item) {
-        if (item == null) {
+        if(item == null) {
             return null;
         }
 
