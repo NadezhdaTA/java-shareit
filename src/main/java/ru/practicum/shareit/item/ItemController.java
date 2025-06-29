@@ -34,8 +34,9 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemResponseDtoWithComments getItemById(@PathVariable Long itemId) {
-        return itemService.getItemById(itemId);
+    public ItemResponseDtoWithComments getItemById(@PathVariable Long itemId,
+                                                   @RequestHeader(OWNER_ID) Long ownerId) {
+        return itemService.getItemById(itemId, ownerId);
     }
 
     @GetMapping

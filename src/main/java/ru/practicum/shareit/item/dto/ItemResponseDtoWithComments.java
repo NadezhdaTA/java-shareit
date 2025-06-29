@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -32,9 +32,9 @@ public class ItemResponseDtoWithComments {
 
     private Long requestId;
 
-    private LocalDateTime lastBooking;
+    private BookingResponseDto lastBooking;
 
-    private LocalDateTime nextBooking;
+    private BookingResponseDto nextBooking;
 
     private List<CommentResponseDto> comments;
 }

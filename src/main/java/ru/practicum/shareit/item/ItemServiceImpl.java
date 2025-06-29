@@ -2,7 +2,9 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.intrfaces.BookingRepository;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.AnotherUserException;
@@ -20,8 +22,10 @@ import ru.practicum.shareit.user.interfaces.UserRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +41,7 @@ public class ItemServiceImpl implements ItemServiceInterface {
     private final ItemMapper itemMapper;
     private final UserMapper userMapper;
     private final CommentMapper commentMapper;
+    private final BookingMapper bookingMapper;
 
     public ItemResponseDto createItem(ItemRequestDto item, Long ownerId) {
         if (ownerId == null) {
@@ -50,25 +55,48 @@ public class ItemServiceImpl implements ItemServiceInterface {
         itemSaved.setOwner(owner);
 
         itemRepository.save(itemSaved);
-        ItemResponseDto responseDto = itemMapper.toItemResponseDto(itemSaved);
-        mapResponseDto(itemSaved, responseDto);
 
-        return responseDto;
+        return itemMapper.toItemResponseDto(itemSaved);
     }
 
-    public ItemResponseDtoWithComments getItemById(Long id) {
-         ItemResponseDto item = itemMapper.toItemResponseDto(itemRepository.getItemByItemId(id)
-                .orElseThrow(() -> new NotFoundException("Item with id " + id + " not found")));
+    public ItemResponseDtoWithComments getItemById(Long itemId, Long ownerId) {
+         ItemResponseDto item = itemMapper.toItemResponseDto(itemRepository.getItemByItemId(itemId)
+                .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " not found")));
 
-         List<CommentResponseDto> comments = commentRepository.getCommentsByItem_ItemId(id).stream()
+         List<CommentResponseDto> comments = commentRepository.getCommentsByItem_ItemId(itemId).stream()
                  .map(commentMapper::toCommentResponseDto)
                  .collect(Collectors.toList());
 
          ItemResponseDtoWithComments itemDto = itemMapper.toItemResponseDtoWithComments(
-                 itemRepository.getItemByItemId(id).get());
+                 itemRepository.getItemByItemId(itemId).get());
          itemDto.setComments(comments);
 
+         if (item.getOwnerId().equals(ownerId)) {
+             List<Booking> bookingsLast= bookingRepository.getBookingsByItem_ItemId(itemId).stream()
+                     .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                     .toList();
+             if (!bookingsLast.isEmpty()) {
+                 BookingResponseDto lastBooking = bookingMapper.bookingToBookingResponseDto(bookingsLast.stream()
+                         .sorted(Comparator.comparing(Booking::getEnd))
+                         .toList()
+                         .getLast());
+                 itemDto.setLastBooking(lastBooking);
+             }
+
+             List<Booking> bookingsNext = bookingRepository.getBookingsByItem_ItemId(itemId).stream()
+                     .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                     .toList();
+
+             if (!bookingsNext.isEmpty()) {
+                 BookingResponseDto nextBooking = bookingMapper.bookingToBookingResponseDto(bookingsNext.stream()
+                         .sorted(Comparator.comparing(Booking::getStart))
+                         .toList()
+                         .getFirst());
+                 itemDto.setNextBooking(nextBooking);
+             }
+         }
         return itemDto;
+
     }
 
     public ItemResponseDto updateItem(Long itemId,
@@ -98,10 +126,7 @@ public class ItemServiceImpl implements ItemServiceInterface {
             throw new AnotherUserException("User with id " + ownerId + " is not owner of this Item");
         }
 
-        ItemResponseDto responseDto = itemMapper.toItemResponseDto(foundItem);
-        mapResponseDto(foundItem, responseDto);
-
-        return responseDto;
+        return itemMapper.toItemResponseDto(foundItem);
     }
 
     public Collection<ItemResponseDto> getAllItemsForOwner(Long ownerId) {
@@ -133,27 +158,15 @@ public class ItemServiceImpl implements ItemServiceInterface {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Booking with bookerId " + commentatorId + " not found"));
 
-        if (!booking.getEnd().isBefore(commentDto.getDate())) {
-            throw new ValidationException("Booking end date cannot be before comment date");
-        }
+        if (booking.getEnd().isBefore(commentDto.getDate()) && booking.getStatus().equals(BookingStatus.APPROVED)) {
+            Comment comment = commentMapper.toComment(commentDto);
+            comment.setItem(itemRepository.getItemByItemId(itemId).get());
+            comment.setAuthor(userRepository.getUserByUserId(commentatorId).get());
 
-        if (booking.getStatus().equals(BookingStatus.APPROVED)) {
-            throw new ValidationException("Booking status cannot be APPROVED");
-        }
+            return commentMapper.toCommentResponseCreatedDto(commentRepository.save(comment));
 
-        Comment comment = commentMapper.toComment(commentDto);
-        comment.setItem(itemRepository.getItemByItemId(itemId).get());
-        comment.setAuthor(userRepository.getUserByUserId(commentatorId).get());
-
-        return commentMapper.toCommentResponseCreatedDto(
-                commentRepository.save(comment));
-    }
-
-    private void mapResponseDto(Item item, ItemResponseDto itemResponseDto) {
-        itemResponseDto.setOwnerId(item.getOwner().getUserId());
-
-        if (item.getItemRequest() != null) {
-            itemResponseDto.setRequestId(item.getItemRequest().getItemRequestId());
+        } else {
+            throw new ValidationException("Comment cannot be added to the booking");
         }
     }
 
