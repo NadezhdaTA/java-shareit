@@ -89,7 +89,7 @@ public class BookingServiceImpl implements BookingServiceInterface {
         Booking booking = bookingRepository.getBookingByBookingId(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found"));
 
-        if(booking.getBooker().getUserId().equals(userId) ||
+        if (booking.getBooker().getUserId().equals(userId) ||
                 booking.getItem().getOwner().getUserId().equals(userId)) {
             return mapBookerAndItemToBooking(booking);
         } else {

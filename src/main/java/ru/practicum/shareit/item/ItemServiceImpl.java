@@ -72,7 +72,7 @@ public class ItemServiceImpl implements ItemServiceInterface {
          itemDto.setComments(comments);
 
          if (item.getOwnerId().equals(ownerId)) {
-             List<Booking> bookingsLast= bookingRepository.getBookingsByItem_ItemId(itemId).stream()
+             List<Booking> bookingsLast = bookingRepository.getBookingsByItem_ItemId(itemId).stream()
                      .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
                      .toList();
              if (!bookingsLast.isEmpty()) {
