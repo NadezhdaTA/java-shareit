@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.model.User;
 @ToString
 @Table(name = "items")
 public class Item {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
