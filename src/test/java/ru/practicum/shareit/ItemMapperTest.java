@@ -1,15 +1,12 @@
-package ru.practicum.shareit.mapperTest;
+package ru.practicum.shareit;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.model.User;
-
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,11 +15,6 @@ public class ItemMapperTest {
 
     @Autowired
     private ItemMapper itemMapper;
-
-    User user = new User(1L, "testName1", "test1@test.com");
-
-    ItemRequest itemRequest = new ItemRequest(1L, "testDescription1",
-            1L, LocalDate.of(2025, 6, 25));
 
     @Test
     public void itemRequestDtoToItemTest() {
@@ -36,13 +28,14 @@ public class ItemMapperTest {
             assertEquals("TestName", item.getItemName());
             assertEquals("Test description", item.getItemDescription());
             assertEquals(true, item.getIsAvailable());
-            assertNull(item.getOwner());
+            assertNull(item.getOwnerId());
+            assertEquals(1L, item.getRequestId());
         });
     }
 
     @Test
     public void itemToItemResponseDtoTest() {
-        Item item = new Item(2L, "TestName2", "Test description2", true, user, itemRequest);
+        Item item = new Item(2L, "TestName2", "Test description2", true, 2L, 2L);
 
         ItemResponseDto itemResponseDto = itemMapper.toItemResponseDto(item);
         assertAll(() -> {
@@ -50,8 +43,8 @@ public class ItemMapperTest {
             assertEquals("TestName2", itemResponseDto.getItemName());
             assertEquals("Test description2", itemResponseDto.getItemDescription());
             assertEquals(true, itemResponseDto.getIsAvailable());
-            assertEquals(user.getUserId(), itemResponseDto.getOwnerId());
-            assertEquals(itemRequest.getItemRequestId(), itemResponseDto.getRequestId());
+            assertEquals(2L, itemResponseDto.getOwnerId());
+            assertEquals(2L, itemResponseDto.getRequestId());
         });
     }
 
@@ -74,8 +67,7 @@ public class ItemMapperTest {
     @Test
     public void itemResponseDtoToItemRequestDtoTest() {
         ItemResponseDto itemResponseDto = new ItemResponseDto(
-                4L, "TestName4", "Test description4",
-                false, 4L, 4L);
+                4L, "TestName4", "Test description4", false, 4L, 4L);
         ItemRequestDto itemRequestDto = itemMapper.toItemRequestDto(itemResponseDto);
         assertAll(() -> {
             assertEquals(4L, itemRequestDto.getItemId());
@@ -86,37 +78,4 @@ public class ItemMapperTest {
         });
     }
 
-    @Test
-    public void itemToItemResponseDtoWithCommentsTest() {
-
-        Item item = new Item(2L, "testName2", "testDescription2",
-                true, user, itemRequest);
-
-        ItemResponseDtoWithComments itemResponse = itemMapper.toItemResponseDtoWithComments(item);
-
-        assertAll(() -> {
-            assertEquals(2L, itemResponse.getItemId());
-            assertEquals("testName2", itemResponse.getItemName());
-            assertEquals("testDescription2", itemResponse.getItemDescription());
-            assertEquals(true, itemResponse.getIsAvailable());
-            assertEquals(user.getUserId(), itemResponse.getOwnerId());
-            assertEquals(itemRequest.getItemRequestId(), itemResponse.getRequestId());
-            assertNull(itemResponse.getComments());
-            assertNull(itemResponse.getLastBooking());
-            assertNull(itemResponse.getNextBooking());
-        });
-    }
-
-    @Test
-    public void itemToItemBookerDto() {
-        Item item = new Item(2L, "testName2", "testDescription2",
-                true, user, itemRequest);
-
-        ItemBookerDto itemBookerDto = itemMapper.toItemBookerDto(item);
-
-        assertAll(() -> {
-            assertEquals(2L, itemBookerDto.getItemId());
-            assertEquals("testName2", itemBookerDto.getItemName());
-        });
-    }
 }

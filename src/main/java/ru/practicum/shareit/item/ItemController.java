@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 
 import java.util.Collection;
 
@@ -18,7 +19,7 @@ import java.util.Collection;
 public class ItemController {
 
     public static final String OWNER_ID = "X-Sharer-User-Id";
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
     @PostMapping
     public ItemResponseDto create(@RequestHeader(OWNER_ID) Long ownerId,
@@ -34,9 +35,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemResponseDtoWithComments getItemById(@PathVariable Long itemId,
-                                                   @RequestHeader(OWNER_ID) Long ownerId) {
-        return itemService.getItemById(itemId, ownerId);
+    public ItemResponseDto getItemById(@PathVariable Long itemId) {
+        return itemService.getItemById(itemId);
     }
 
     @GetMapping
@@ -48,13 +48,6 @@ public class ItemController {
     @GetMapping("/search")
     public Collection<ItemResponseDto> searchItems(@RequestParam String text) {
         return itemService.searchByText(text);
-    }
-
-    @PostMapping("/{itemId}/comment")
-    public CommentResponseCreatedDto addComment(@RequestBody CommentRequestDto comment,
-                                                @PathVariable Long itemId,
-                                                @RequestHeader(OWNER_ID) Long commentatorId) {
-        return itemService.addComment(commentatorId, comment, itemId);
     }
 
 }

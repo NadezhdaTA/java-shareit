@@ -1,10 +1,8 @@
-package ru.practicum.shareit.mapperTest;
+package ru.practicum.shareit;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.user.dto.UserAuthorDto;
-import ru.practicum.shareit.user.dto.UserBookingDto;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -62,30 +60,6 @@ public class UserMapperTest {
             assertEquals(4L, userResponseDto.getUserId());
             assertEquals("TestName4", userResponseDto.getUserName());
             assertEquals("test4@test.com", userResponseDto.getUserEmail());
-        });
-    }
-
-    @Test
-    public void userToUserAuthorDtoTest() {
-        User user = new User(5L, "TestName5", "test5@test.com");
-
-        UserAuthorDto userAuthorDto = userMapper.toUserAuthorDto(user);
-
-        assertAll(() -> {
-            assertEquals(5L, userAuthorDto.getUserId());
-            assertEquals("TestName5", userAuthorDto.getUserName());
-        });
-    }
-
-    @Test
-    public void userToUserBookingDtoTest() {
-        User user = new User(6L, "TestName6", "test6@test.com");
-
-        UserBookingDto userBookingDto = userMapper.toUserBookingDto(user);
-
-        assertAll(() -> {
-            assertEquals(6L, userBookingDto.getUserId());
-            assertEquals("TestName6", userBookingDto.getUserName());
         });
     }
 }

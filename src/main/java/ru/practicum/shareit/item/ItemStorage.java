@@ -49,7 +49,7 @@ public class ItemStorage implements ItemStorageInterface {
     public Collection<Item> getAllItemsForOwner(Long ownerId) {
         return items.values()
                 .stream()
-                .filter(item -> Objects.equals(item.getOwner().getUserId(), ownerId))
+                .filter(item -> Objects.equals(item.getOwnerId(), ownerId))
                 .collect(Collectors.toList());
     }
 
