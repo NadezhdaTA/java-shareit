@@ -29,7 +29,7 @@ public interface ItemMapper {
         itemResponseDto.setOwnerId(item.getOwner().getUserId());
 
         if (item.getItemRequest() != null) {
-            itemResponseDto.setRequestId(item.getItemRequest().getRequesterId());
+            itemResponseDto.setRequestId(item.getItemRequest().getItemRequestId());
         }
 
         return itemResponseDto;

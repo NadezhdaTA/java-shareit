@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.booking.intrfaces.BookingServiceInterface;
+
 
 import java.util.Collection;
 
@@ -13,7 +13,8 @@ import java.util.Collection;
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
 public class BookingController {
-    private final BookingServiceInterface bookingService;
+
+    private final BookingServiceImpl bookingService;
     public static final String USER_ID = "X-Sharer-User-Id";
 
     @PostMapping
