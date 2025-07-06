@@ -9,12 +9,13 @@ import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dto.UserAuthorDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ public class CommentMapperTest {
     User user = new User(1L, "testName1", "test1@test.com");
 
     ItemRequest itemRequest = new ItemRequest(1L, "testDescription1",
-            1L, LocalDate.of(2025, 6, 25));
+            user, LocalDateTime.of(2025, 6, 25, 15, 25));
 
     Item item = new Item(1L, "TestName1", "Test description1", true, user, itemRequest);
 
