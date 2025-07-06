@@ -6,10 +6,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +23,7 @@ public class ItemMapperTest {
     User user = new User(1L, "testName1", "test1@test.com");
 
     ItemRequest itemRequest = new ItemRequest(1L, "testDescription1",
-            1L, LocalDate.of(2025, 6, 25));
+            user, LocalDateTime.of(2025, 6, 25, 15, 25));
 
     @Test
     public void itemRequestDtoToItemTest() {

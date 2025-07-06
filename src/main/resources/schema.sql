@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS bookings (
 
 CREATE TABLE IF NOT EXISTS requests (
     request_id BIGSERIAL PRIMARY KEY,
-    requestor_id BIGINT NOT NULL,
-    description  CHARACTER VARYING (200),
-    FOREIGN KEY (requestor_id) REFERENCES users (user_id) ON DELETE CASCADE
+    requester_id BIGINT NOT NULL,
+    description  CHARACTER VARYING (200) NOT NULL,
+    request_date TIMESTAMP WITHOUT TIME ZONE,
+    FOREIGN KEY (requester_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
