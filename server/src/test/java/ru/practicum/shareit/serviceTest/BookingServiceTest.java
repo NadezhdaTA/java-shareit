@@ -241,4 +241,5 @@ public class BookingServiceTest extends TestData {
             assertEquals(1, bookings.size());
         });
     }
+
 }
