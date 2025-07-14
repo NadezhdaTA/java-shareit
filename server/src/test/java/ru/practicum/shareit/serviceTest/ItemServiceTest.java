@@ -5,36 +5,47 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.TestData;
+import ru.practicum.shareit.booking.BookingServiceImpl;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.exception.AnotherUserException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemServiceImpl;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.request.RequestServiceImpl;
+import ru.practicum.shareit.request.dto.RequestInputDto;
+import ru.practicum.shareit.request.dto.RequestOutputDto;
+import ru.practicum.shareit.user.UserServiceImpl;
+import ru.practicum.shareit.user.dto.UserResponseDto;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(properties = "jdbc.url=jdbc:h2:mem:testdb;MODE=PostgreSQL",
+        webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@Sql(value = "/test-data.sql")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ItemServiceTest extends TestData {
     private final ItemServiceImpl itemService;
+    private final UserServiceImpl userService;
+    private final RequestServiceImpl requestService;
+    private final BookingServiceImpl bookingService;
 
     @Test
     public void addItemTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
         ItemRequestDto forCreation = new ItemRequestDto();
         forCreation.setItemName("Test");
         forCreation.setItemDescription("Test item description");
         forCreation.setIsAvailable(true);
 
-        ItemResponseDto saved = itemService.createItem(forCreation, user1.getUserId());
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
 
         assertAll(() -> {
             assertNotNull(saved);
@@ -45,6 +56,8 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void addItem_WithNullOwnerIdTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
         ItemRequestDto forCreation = new ItemRequestDto();
         forCreation.setItemName("Test");
         forCreation.setItemDescription("Test item description");
@@ -56,62 +69,99 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void addItem_WithUserNotFoundTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
         ItemRequestDto forCreation = new ItemRequestDto();
         forCreation.setItemName("Test");
         forCreation.setItemDescription("Test item description");
         forCreation.setIsAvailable(true);
 
         assertThrows(NotFoundException.class,
-                () -> itemService.createItem(forCreation, 5L));
+                () -> itemService.createItem(forCreation, 573L));
     }
 
     @Test
     void addItem_WithRequestIdTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        RequestInputDto request = new RequestInputDto();
+        request.setRequestDescription("Test request description");
+        RequestOutputDto reqSaved = requestService.addItemRequest(request, user.getUserId());
+
         ItemRequestDto forCreation = new ItemRequestDto();
         forCreation.setItemName("Test");
         forCreation.setItemDescription("Test item description");
         forCreation.setIsAvailable(true);
-        forCreation.setRequestId(1L);
+        forCreation.setRequestId(reqSaved.getItemRequestId());
 
-        ItemResponseDto saved = itemService.createItem(forCreation, user1.getUserId());
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
         assertAll(() -> {
             assertNotNull(saved);
-            assertEquals(1L, saved.getRequestId());
+            assertEquals(reqSaved.getItemRequestId(), saved.getRequestId());
         });
     }
 
     @Test
     void addItem_WithWrongRequestIdTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
         ItemRequestDto forCreation = new ItemRequestDto();
         forCreation.setItemName("Test");
         forCreation.setItemDescription("Test item description");
         forCreation.setIsAvailable(true);
-        forCreation.setRequestId(5L);
+        forCreation.setRequestId(525L);
 
         assertThrows(NotFoundException.class,
-                () -> itemService.createItem(forCreation, user1.getUserId()));
+                () -> itemService.createItem(forCreation, user.getUserId()));
 
     }
 
     @Test
     void getItemByIdTest() {
-        ItemResponseDtoWithComments found = itemService.getItemById(1L, 1L);
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        ItemResponseDtoWithComments found = itemService.getItemById(saved.getItemId(), user.getUserId());
 
         assertAll(() -> {
             assertNotNull(found);
-            assertThat(found.getItemId()).isEqualTo(1L);
+            assertThat(found.getItemId()).isEqualTo(saved.getItemId());
         });
     }
 
     @Test
     void getItemById_WithWrongItemIdTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        ItemResponseDtoWithComments found = itemService.getItemById(saved.getItemId(), user.getUserId());
+
         assertThrows(NotFoundException.class,
-                () -> itemService.getItemById(5L, 2L));
+                () -> itemService.getItemById(535L, user.getUserId()));
     }
 
     @Test
     void getItemById_WithOwnerIdTest() {
-        ItemResponseDtoWithComments found = itemService.getItemById(1L, 1L);
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        ItemResponseDtoWithComments found = itemService.getItemById(saved.getItemId(), user.getUserId());
+
         assertAll(() -> {
             assertNotNull(found);
             assertNotNull(found.getComments());
@@ -119,8 +169,16 @@ public class ItemServiceTest extends TestData {
     }
 
     @Test
-    void getItemById_WithNotOwnerIdTest() {
-        ItemResponseDtoWithComments found = itemService.getItemById(2L, 1L);
+    void getItemById_WithWrongOwnerIdTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        ItemResponseDtoWithComments found = itemService.getItemById(saved.getItemId(), 237L);
         assertAll(() -> {
             assertNotNull(found);
             assertEquals(0, found.getComments().size());
@@ -129,7 +187,23 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void getItemById_WithOwnerId_AndLastBookingTest() {
-        ItemResponseDtoWithComments found = itemService.getItemById(1L, 1L);
+        UserResponseDto user = userService.createUser(userForCreate());
+        UserResponseDto user2 = userService.createUser(user2ForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        BookingRequestDto booking2 = booking1ForCreate();
+        booking2.setStart(LocalDateTime.of(2025, 3, 7, 14, 40, 35));
+        booking2.setEnd(LocalDateTime.of(2025, 5, 25, 18, 12, 43));
+        booking2.setItemId(saved.getItemId());
+        booking2.setBookerId(user2.getUserId());
+        bookingService.addBooking(booking2, user2.getUserId());
+
+        ItemResponseDtoWithComments found = itemService.getItemById(saved.getItemId(), user.getUserId());
         assertAll(() -> {
             assertNotNull(found);
             assertNotNull(found.getLastBooking());
@@ -138,7 +212,23 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void getItemById_WithOwnerId_AndNextBookingTest() {
-        ItemResponseDtoWithComments found = itemService.getItemById(1L, 1L);
+        UserResponseDto user = userService.createUser(userForCreate());
+        UserResponseDto user2 = userService.createUser(user2ForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        BookingRequestDto booking2 = booking1ForCreate();
+        booking2.setStart(LocalDateTime.of(2025, 9, 7, 14, 40, 35));
+        booking2.setEnd(LocalDateTime.of(2025, 10, 25, 18, 12, 43));
+        booking2.setItemId(saved.getItemId());
+        booking2.setBookerId(user2.getUserId());
+        bookingService.addBooking(booking2, user2.getUserId());
+
+        ItemResponseDtoWithComments found = itemService.getItemById(saved.getItemId(), user.getUserId());
         assertAll(() -> {
             assertNotNull(found);
             assertNotNull(found.getNextBooking());
@@ -147,12 +237,21 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void updateItemTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
         ItemRequestDto forUpdate = new ItemRequestDto();
-        forUpdate.setItemName("Test");
-        forUpdate.setItemDescription("Test item description");
+        forUpdate.setItemName("TestName");
+        forUpdate.setItemDescription("Test description");
         forUpdate.setIsAvailable(true);
 
-        ItemResponseDto updated = itemService.updateItem(1L, forUpdate, user1.getUserId());
+        ItemResponseDto updated = itemService.updateItem(saved.getItemId(), forUpdate, user.getUserId());
+
         assertAll(() -> {
             assertNotNull(updated);
             assertThat(forUpdate).usingRecursiveComparison()
@@ -162,23 +261,40 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void updateItem_WithWrongOwnerTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+        UserResponseDto user2 = userService.createUser(user2ForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
         ItemRequestDto forUpdate = new ItemRequestDto();
-        forUpdate.setItemName("Test");
-        forUpdate.setItemDescription("Test item description");
+        forUpdate.setItemName("TestName");
+        forUpdate.setItemDescription("Test description");
         forUpdate.setIsAvailable(true);
 
         assertThrows(AnotherUserException.class,
-                () -> itemService.updateItem(1L, forUpdate, user2.getUserId()));
+                () -> itemService.updateItem(saved.getItemId(), forUpdate, user2.getUserId()));
 
     }
 
     @Test
     void updateItem_WithoutItemNameTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
         ItemRequestDto forUpdate = new ItemRequestDto();
         forUpdate.setItemDescription("Test item description");
         forUpdate.setIsAvailable(true);
 
-        ItemResponseDto updated = itemService.updateItem(1L, forUpdate, user1.getUserId());
+        ItemResponseDto updated = itemService.updateItem(saved.getItemId(), forUpdate, user.getUserId());
         assertAll(() -> {
             assertNotNull(updated);
             assertThat(forUpdate).usingRecursiveComparison()
@@ -188,11 +304,19 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void updateItem_WithoutItemDescriptionTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
         ItemRequestDto forUpdate = new ItemRequestDto();
         forUpdate.setItemName("Test");
         forUpdate.setIsAvailable(true);
 
-        ItemResponseDto updated = itemService.updateItem(1L, forUpdate, user1.getUserId());
+        ItemResponseDto updated = itemService.updateItem(saved.getItemId(), forUpdate, user.getUserId());
         assertAll(() -> {
             assertNotNull(updated);
             assertThat(forUpdate).usingRecursiveComparison()
@@ -202,11 +326,19 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void updateItem_WithoutIsAvailableTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
         ItemRequestDto forUpdate = new ItemRequestDto();
         forUpdate.setItemName("Test");
         forUpdate.setItemDescription("Test item description");
 
-        ItemResponseDto updated = itemService.updateItem(1L, forUpdate, user1.getUserId());
+        ItemResponseDto updated = itemService.updateItem(saved.getItemId(), forUpdate, user.getUserId());
         assertAll(() -> {
             assertNotNull(updated);
             assertThat(forUpdate).usingRecursiveComparison()
@@ -216,25 +348,70 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void getAllItemsForOwnerTest() {
-        Collection<ItemResponseDto> items = itemService.getAllItemsForOwner(user1.getUserId());
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        ItemRequestDto forCreation2 = new ItemRequestDto();
+        forCreation2.setItemName("Test2");
+        forCreation2.setItemDescription("Test item description2");
+        forCreation2.setIsAvailable(true);
+        ItemResponseDto saved2 = itemService.createItem(forCreation2, user.getUserId());
+
+        Collection<ItemResponseDto> items = itemService.getAllItemsForOwner(user.getUserId());
         assertAll(() -> {
             assertNotNull(items);
-            assertEquals(1, items.size());
+            assertEquals(2, items.size());
         });
     }
 
     @Test
     void getAllItemsForOwner_WithWrongUserTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        ItemRequestDto forCreation2 = new ItemRequestDto();
+        forCreation2.setItemName("Test2");
+        forCreation2.setItemDescription("Test item description2");
+        forCreation2.setIsAvailable(true);
+        ItemResponseDto saved2 = itemService.createItem(forCreation2, user.getUserId());
+
         assertThrows(NotFoundException.class,
-                () -> itemService.getAllItemsForOwner(5L));
+                () -> itemService.getAllItemsForOwner(458L));
     }
 
     @Test
     void addCommentTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+        UserResponseDto user2 = userService.createUser(user2ForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        BookingRequestDto booking2 = booking1ForCreate();
+        booking2.setStart(LocalDateTime.of(2025, 3, 7, 14, 40, 35));
+        booking2.setEnd(LocalDateTime.of(2025, 5, 25, 18, 12, 43));
+        booking2.setItemId(saved.getItemId());
+        booking2.setBookerId(user2.getUserId());
+        BookingResponseDto bookingSaved = bookingService.addBooking(booking2, user.getUserId());
+        bookingService.bookingApprove(bookingSaved.getBookingId(), user.getUserId(), false);
+
         CommentRequestDto comment = new CommentRequestDto();
         comment.setText("Test comment");
 
-        CommentResponseCreatedDto created = itemService.addComment(1L, comment, 2L);
+        CommentResponseCreatedDto created = itemService.addComment(user.getUserId(), comment, saved.getItemId());
 
         assertAll(() -> {
             assertNotNull(created);
@@ -244,25 +421,67 @@ public class ItemServiceTest extends TestData {
 
     @Test
     void addComment_WithWrongCommentatorTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+        UserResponseDto user2 = userService.createUser(user2ForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        BookingRequestDto booking2 = booking1ForCreate();
+        booking2.setStart(LocalDateTime.of(2025, 3, 7, 14, 40, 35));
+        booking2.setEnd(LocalDateTime.of(2025, 5, 25, 18, 12, 43));
+        booking2.setItemId(saved.getItemId());
+        booking2.setBookerId(user2.getUserId());
+        BookingResponseDto bookingSaved = bookingService.addBooking(booking2, user.getUserId());
+        bookingService.bookingApprove(bookingSaved.getBookingId(), user.getUserId(), false);
+
         CommentRequestDto comment = new CommentRequestDto();
         comment.setText("Test comment");
 
         assertThrows(NotFoundException.class,
-                () -> itemService.addComment(5L, comment, 2L));
+                () -> itemService.addComment(256L, comment, saved.getItemId()));
     }
 
     @Test
     void addComment_WithWrongDateTest() {
+        UserResponseDto user = userService.createUser(userForCreate());
+        UserResponseDto user2 = userService.createUser(user2ForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        BookingRequestDto booking2 = booking1ForCreate();
+        booking2.setStart(LocalDateTime.of(2025, 6, 8, 14, 40, 35));
+        booking2.setEnd(LocalDateTime.of(2025, 9, 25, 18, 12, 43));
+        booking2.setItemId(saved.getItemId());
+        booking2.setBookerId(user2.getUserId());
+        BookingResponseDto bookingSaved = bookingService.addBooking(booking2, user.getUserId());
+        bookingService.bookingApprove(bookingSaved.getBookingId(), user.getUserId(), false);
+
         CommentRequestDto comment = new CommentRequestDto();
         comment.setText("Test comment");
 
         assertThrows(ValidationException.class,
-                () -> itemService.addComment(1L, comment, 1L));
+                () -> itemService.addComment(user.getUserId(), comment, saved.getItemId()));
     }
 
     @Test
     void searchByTextTest() {
-        Collection<ItemResponseDto> items = itemService.searchByText("testItem2");
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        ItemRequestDto forCreation = new ItemRequestDto();
+        forCreation.setItemName("Test");
+        forCreation.setItemDescription("Test item description");
+        forCreation.setIsAvailable(true);
+        ItemResponseDto saved = itemService.createItem(forCreation, user.getUserId());
+
+        Collection<ItemResponseDto> items = itemService.searchByText("Test");
 
         assertAll(() -> {
             assertNotNull(items);

@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.TestData;
 import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -22,10 +20,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(properties = "jdbc.url=jdbc:h2:mem:testdb;MODE=PostgreSQL",
+        webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@Sql(value = "/test-data.sql")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserServiceTest extends TestData {
     private final UserServiceImpl userService;
     private final UserRepository userRepository;
@@ -45,17 +42,20 @@ public class UserServiceTest extends TestData {
 
     @Test
     void createUser_WithWrongEmailTest() {
+        userService.createUser(userForCreate());
         assertThrows(DuplicatedDataException.class,
                 () -> userService.createUser(userRequestDto1));
     }
 
     @Test
     void getUserByIdTest() {
-        UserResponseDto found = userService.getUserById(1L);
+        UserResponseDto user = userService.createUser(userForCreate());
+
+        UserResponseDto found = userService.getUserById(user.getUserId());
 
         assertAll(() -> {
             assertNotNull(found);
-            assertThat(found).usingRecursiveComparison().isEqualTo(userResponseDto1);
+            assertThat(found).usingRecursiveComparison().isEqualTo(user);
         });
     }
 
@@ -67,15 +67,18 @@ public class UserServiceTest extends TestData {
 
     @Test
     void updateUserTest() {
+
+        UserResponseDto user = userService.createUser(userForCreate());
+
         UserRequestDto forUpdate = new UserRequestDto();
         forUpdate.setUserName("UpdatedName");
         forUpdate.setUserEmail("UpdatedEmail@mail.ru");
 
-        UserResponseDto updated = new UserResponseDto(1L, "UpdatedName", "UpdatedEmail@mail.ru");
+        UserResponseDto updated = new UserResponseDto(user.getUserId(), "UpdatedName", "UpdatedEmail@mail.ru");
 
-        UserResponseDto userResponseDto = userService.updateUser(1L, forUpdate);
+        UserResponseDto userResponseDto = userService.updateUser(user.getUserId(), forUpdate);
         assertAll(() -> {
-            assertEquals(userBookingDto1.getUserId(), userResponseDto.getUserId());
+            assertEquals(user.getUserId(), userResponseDto.getUserId());
             assertThat(updated).usingRecursiveComparison().ignoringFields("userId").isEqualTo(userResponseDto);
         });
     }
@@ -91,11 +94,11 @@ public class UserServiceTest extends TestData {
 
     @Test
     void deleteUserByIdTest() {
-        assertEquals(userResponseDto1, userService.getUserById(1L));
+        UserResponseDto user = userService.createUser(userForCreate());
 
-        userService.deleteUser(1L);
+        userService.deleteUser(user.getUserId());
 
-        assertThrows(NotFoundException.class, () -> userService.getUserById(1L));
+        assertThrows(NotFoundException.class, () -> userService.getUserById(user.getUserId()));
 
     }
 

@@ -29,6 +29,21 @@ public class TestData {
     public static UserBookingDto userBookingDto1 = new UserBookingDto(1L, "TestUser1");
     public static UserAuthorDto userAuthorDto1 = new UserAuthorDto(1L, "TestUser1");
     public static UserRequestDto userRequestDto1 = new UserRequestDto(1L, "TestUser1", "user1@mail.ru");
+
+    public static UserRequestDto userForCreate() {
+        UserRequestDto user = new UserRequestDto();
+        user.setUserName("TestUser1");
+        user.setUserEmail("user1@mail.ru");
+        return user;
+    }
+
+    public static UserRequestDto user2ForCreate() {
+        UserRequestDto user = new UserRequestDto();
+        user.setUserName("TestUser2");
+        user.setUserEmail("user2@mail.ru");
+        return user;
+    }
+
     public static UserResponseDto userResponseDto1 = new UserResponseDto(1L, "TestUser1", "user1@mail.ru");
 
 
@@ -52,6 +67,29 @@ public class TestData {
             "Test request description1", userBookingDto1,
             LocalDateTime.of(2025, 7, 7, 10, 15, 25), new ArrayList<>());
 
+    public static ItemRequestDto itemForCreate() {
+        ItemRequestDto request = new ItemRequestDto();
+        request.setItemName("testItem1");
+        request.setItemDescription("test description1");
+        request.setIsAvailable(true);
+        return request;
+    }
+
+    public static ItemRequestDto item2ForCreate() {
+        ItemRequestDto request = new ItemRequestDto();
+        request.setItemName("testItem2");
+        request.setItemDescription("test description2");
+        request.setIsAvailable(false);
+        return request;
+    }
+
+    public static ItemRequestDto itemForUpdate() {
+        ItemRequestDto request = new ItemRequestDto();
+        request.setItemName("testItem1");
+        request.setItemDescription("test description1");
+        request.setIsAvailable(false);
+        return request;
+    }
 
     public static ItemRequest request2 = new ItemRequest(2L, "Test request description2", user2,
             LocalDateTime.of(2025, 8, 8, 15, 10, 20));
@@ -62,6 +100,7 @@ public class TestData {
     public static RequestOutputWithItemsDto requestWithItemsDto2 = new RequestOutputWithItemsDto(2L,
             "Test request description2", userBookingDto2,
             LocalDateTime.of(2025, 8, 8, 15, 10, 20), new ArrayList<>());
+
 
     public static List<RequestOutputDto> requests = List.of(requestOutputDto1);
 
@@ -92,40 +131,74 @@ public class TestData {
 
     public Collection<ItemResponseDto> itemsFound = List.of(itemResponseDto2);
 
-
-    public static Booking booking1 = new Booking(1L, LocalDateTime.of(2025, 7, 7, 14, 40, 35),
-            LocalDateTime.of(2025, 7, 25, 18, 12, 43), item1, user1, BookingStatus.WAITING);
     public static BookingResponseDto responseBooking1 = new BookingResponseDto(1L, LocalDateTime.of(2025, 7, 7, 14, 40, 35),
             LocalDateTime.of(2025, 7, 15, 18, 12, 43), itemBookerDto1, userBookingDto1, BookingStatus.WAITING);
     public static BookingRequestDto bookingRequestDto1 = new BookingRequestDto(1L, LocalDateTime.of(2025, 7, 7, 14, 40, 35),
             LocalDateTime.of(2025, 7, 15, 18, 12, 43), itemBookerDto1.getItemId(), userBookingDto1.getUserId(), BookingStatus.WAITING);
 
+    public static BookingRequestDto booking1ForCreate() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setStart(LocalDateTime.of(2025, 7, 7, 14, 40, 35));
+        bookingRequestDto.setEnd(LocalDateTime.of(2025, 7, 25, 18, 12, 43));
+        bookingRequestDto.setItemId(1L);
+        bookingRequestDto.setBookerId(1L);
+        bookingRequestDto.setStatus(BookingStatus.WAITING);
+        return bookingRequestDto;
+    }
 
-    public static Booking booking2 = new Booking(2L, LocalDateTime.of(2025, 8, 8, 15, 45, 30),
-            LocalDateTime.of(2025, 8, 18, 12, 10, 40), item2, user2, BookingStatus.APPROVED);
     public static BookingResponseDto responseBooking2 = new BookingResponseDto(2L, LocalDateTime.of(2025, 8, 8, 15, 45, 30),
             LocalDateTime.of(2025, 8, 18, 12, 10, 40), itemBookerDto2, userBookingDto2, BookingStatus.APPROVED);
-    public static BookingRequestDto bookingRequestDto2 = new BookingRequestDto(2L, LocalDateTime.of(2025, 8, 8, 15, 45, 30),
-            LocalDateTime.of(2025, 8, 18, 12, 10, 40), itemBookerDto2.getItemId(), userBookingDto2.getUserId(), BookingStatus.APPROVED);
 
-
-    public static Booking bookingPast = new Booking(3L, LocalDateTime.of(2025, 3, 7, 14, 40, 35),
-            LocalDateTime.of(2025, 5, 25, 18, 12, 43), item1, user1, BookingStatus.WAITING);
     public static BookingResponseDto responseBooking3 = new BookingResponseDto(3L, LocalDateTime.of(2025, 3, 7, 14, 40, 35),
             LocalDateTime.of(2025, 5, 25, 18, 12, 43), itemBookerDto1, userBookingDto1, BookingStatus.WAITING);
+
 
     public static Booking bookingFuture = new Booking(4L, LocalDateTime.of(2025, 9, 7, 14, 40, 35),
             LocalDateTime.of(2025, 10, 25, 18, 12, 43), item1, user1, BookingStatus.WAITING);
     public static BookingResponseDto responseBooking4 = new BookingResponseDto(4L, LocalDateTime.of(2025, 9, 7, 14, 40, 35),
             LocalDateTime.of(2025, 10, 25, 18, 12, 43), itemBookerDto1, userBookingDto1, BookingStatus.WAITING);
 
+
+    public static BookingRequestDto booking4ForCreate() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setStart(LocalDateTime.of(2025, 9, 7, 14, 40, 35));
+        bookingRequestDto.setEnd(LocalDateTime.of(2025, 10, 25, 18, 12, 43));
+        bookingRequestDto.setItemId(1L);
+        bookingRequestDto.setStatus(BookingStatus.WAITING);
+        return bookingRequestDto;
+    }
+
     public static Booking bookingRejected = new Booking(5L, LocalDateTime.of(2025, 5, 7, 14, 40, 35),
             LocalDateTime.of(2025, 10, 25, 18, 12, 43), item1, user1, BookingStatus.REJECTED);
     public static BookingResponseDto responseBooking5 = new BookingResponseDto(5L, LocalDateTime.of(2025, 5, 7, 14, 40, 35),
             LocalDateTime.of(2025, 10, 25, 18, 12, 43), itemBookerDto1, userBookingDto1, BookingStatus.REJECTED);
 
+    public static BookingRequestDto booking5ForCreate() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setStart(LocalDateTime.of(2025, 5, 7, 14, 40, 35));
+        bookingRequestDto.setEnd(LocalDateTime.of(2025, 10, 25, 18, 12, 43));
+        bookingRequestDto.setItemId(1L);
+        bookingRequestDto.setStatus(BookingStatus.REJECTED);
+        return bookingRequestDto;
+    }
+
+    public static BookingRequestDto bookingForUpdate() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setStatus(BookingStatus.REJECTED);
+        return bookingRequestDto;
+    }
+
     public static BookingRequestDto bookingRequestDto5 = new BookingRequestDto(3L, LocalDateTime.of(2025, 2, 7, 14, 40, 35),
             LocalDateTime.of(2025, 2, 25, 18, 12, 43), itemBookerDto2.getItemId(), userBookingDto1.getUserId(), BookingStatus.APPROVED);
+
+    public static BookingRequestDto booking6ForCreate() {
+        BookingRequestDto bookingRequestDto = new BookingRequestDto();
+        bookingRequestDto.setStart(LocalDateTime.of(2025, 2, 7, 14, 40, 35));
+        bookingRequestDto.setEnd(LocalDateTime.of(2025, 2, 25, 18, 12, 43));
+        bookingRequestDto.setItemId(1L);
+        bookingRequestDto.setStatus(BookingStatus.APPROVED);
+        return bookingRequestDto;
+    }
 
     public Collection<BookingResponseDto> bookings = Arrays.asList(responseBooking1, responseBooking2, responseBooking3, responseBooking4, responseBooking5);
 
@@ -135,6 +208,11 @@ public class TestData {
     public static CommentResponseDto commentResponseDto1 = new CommentResponseDto(1L, "Test comment text1", userAuthorDto1);
     public static CommentResponseCreatedDto createdDto = new CommentResponseCreatedDto(1L, "Test comment text1", userAuthorDto1.getUserName(), true);
 
+    public static CommentRequestDto commentForCreation() {
+        CommentRequestDto commentRequestDto = new CommentRequestDto();
+        commentRequestDto.setText("Test comment text1");
+        return commentRequestDto;
+    }
 
 }
 
