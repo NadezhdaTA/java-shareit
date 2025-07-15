@@ -9,9 +9,10 @@ import java.util.Optional;
 public interface RequestRepository extends JpaRepository<ItemRequest,Long> {
     ItemRequest save(ItemRequest item);
 
-    List<ItemRequest> getRequestByRequester_UserId(Long userId);
+    List<ItemRequest> findItemRequestByRequester_UserIdOrderByCreatedAtDesc(Long userId);
 
-    List<ItemRequest> findAll();
+    List<ItemRequest> findAllByOrderByCreatedAtDesc();
 
     Optional<ItemRequest> getRequestByItemRequestId(Long requestId);
+
 }

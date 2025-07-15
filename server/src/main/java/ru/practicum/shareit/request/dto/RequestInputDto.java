@@ -17,5 +17,5 @@ public class RequestInputDto {
     @JsonProperty("description")
     private String requestDescription;
 
-    private LocalDateTime requestDate = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

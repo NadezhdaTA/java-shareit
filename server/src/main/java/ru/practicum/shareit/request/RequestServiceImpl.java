@@ -17,7 +17,6 @@ import ru.practicum.shareit.user.interfaces.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -43,22 +42,17 @@ public class RequestServiceImpl implements RequestServiceInterface {
     public List<RequestOutputDto> getRequestByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        List<ItemRequest> requests = requestRepository.getRequestByRequester_UserId(userId);
 
-        return requestRepository.getRequestByRequester_UserId(userId).stream()
+        return requestRepository.findItemRequestByRequester_UserIdOrderByCreatedAtDesc(userId).stream()
                 .map(requestMapper::toRequestOutputDto)
-                .sorted(Comparator.comparing(RequestOutputDto::getRequestDate))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     @Override
     public List<RequestOutputDto> getAllRequests() {
-        return requestRepository.findAll().stream()
+        return requestRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(requestMapper::toRequestOutputDto)
-                .sorted(Comparator.comparing(RequestOutputDto::getRequestDate))
-                .toList()
-                .reversed();
+                .toList();
     }
 
     @Override
@@ -66,7 +60,8 @@ public class RequestServiceImpl implements RequestServiceInterface {
         ItemRequest itemRequest = requestRepository.getRequestByItemRequestId(requestId)
                 .orElseThrow(() -> new NotFoundException("Request not found"));
 
-        Collection<ItemResponseDto> items = itemRepository.getItemsByItemRequest_ItemRequestId(requestId).stream()
+        Collection<ItemResponseDto> items =
+                itemRepository.getItemsByItemRequest_ItemRequestId(requestId).stream()
                 .map(itemMapper::toItemResponseDto)
                 .toList();
 

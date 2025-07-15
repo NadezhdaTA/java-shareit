@@ -21,5 +21,5 @@ public class RequestOutputDto {
     private UserBookingDto requester;
 
     @JsonProperty("created")
-    private LocalDateTime requestDate;
+    private LocalDateTime createdAt;
 }

@@ -23,7 +23,7 @@ public class RequestOutputWithItemsDto {
     private UserBookingDto requester;
 
     @JsonProperty("created")
-    private LocalDateTime requestDate;
+    private LocalDateTime createdAt;
 
     @JsonProperty("items")
     Collection<ItemResponseDto> items;
