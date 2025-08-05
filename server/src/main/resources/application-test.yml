@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    generate-ddl: false
+    hibernate.ddl-auto: none
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    driverClassName: org.h2.Driver
+    username: user
+    password: 12345
+  sql:
+    init:
+      mode: always
