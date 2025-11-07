@@ -4,7 +4,6 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.RequestInputDto;
 import ru.practicum.shareit.request.dto.RequestOutputDto;
 import ru.practicum.shareit.request.dto.RequestOutputWithItemsDto;
@@ -103,8 +102,6 @@ public class TestData {
     public static List<RequestOutputDto> allRequests = List.of(requestOutputDto1, requestOutputDto2);
 
 
-    public static Item item1 = new Item(1L, "testItem1",
-            "test description1", false, user1, request1);
     public static ItemRequestDto itemRequestDto1 = new ItemRequestDto(1L, "testItem1",
             "test description1", false, request1.getItemRequestId());
     public static ItemBookerDto itemBookerDto1 = new ItemBookerDto(1L, "testItem1");
